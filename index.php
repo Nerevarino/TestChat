@@ -1,34 +1,22 @@
 <?php
 
 //definitions
-  $max_messages=20;
-  $message_text="";
-  $message_file=null;
-  $visible_messages=null;
-  
-
   function receive_input()
   {
-      global $message_text;
-      $message_text = $_POST['message_text'];          
+      return $_POST['message_text'];          
   }
 
-  function save_input()
+  function save_input($message_text)
   {
-      global $message_text;
-      global $message_file;
       
       $message_file=fopen("chat.log", "a");
       fwrite($message_file,$message_text . "\n");
       fclose($message_file);
-      $message_file=null;    
   }
 
   function prepare_output()
   {
-      global $visible_messages;
-      global $message_file;
-      global $max_messages;
+      $max_messages=20;
       
       $visible_messages=array();
       
@@ -38,7 +26,6 @@
       fseek($message_file, 0, SEEK_SET);      
       $chat_text=fread($message_file, $file_size);
       fclose($message_file);
-      $message_file=null;
 
       $messages_array=explode("\n",$chat_text);
       $messages_count = count($messages_array);
@@ -49,7 +36,7 @@
       else{
           $visible_messages=$messages_array;
       }
-      
+      return $visible_messages;
   }
 
 
@@ -64,11 +51,10 @@
 
 //script
 if(isset($_POST['message_text'])){
-    receive_input();
-    save_input();
+    save_input(receive_input());
 }
 
-prepare_output();
+$visible_messages=prepare_output();
 //script
 
 ?>
